@@ -380,7 +380,7 @@
     <section class="screenshots" id="screenshots">
         <h2>See It In Action</h2>
         <div class="screenshot-container">
-            <div class="screenshot">
+            <div class="screenshot" id="phoneSimulator" style="transition: transform 0.3s ease;">
                 <div class="screen-content">
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
                         <div id="prevNumber" style="opacity: 0.3; font-size: 36px; color: #999; line-height: 0.8;">1</div>
@@ -395,6 +395,16 @@
                         <p>Click the buttons to count</p>
                         <p style="font-size: 12px; margin-top: 5px;">On iOS, tilt your device!</p>
                     </div>
+                </div>
+            </div>
+            <div style="margin-top: 40px; text-align: center;">
+                <label for="tiltSlider" style="color: #666; font-size: 16px; display: block; margin-bottom: 10px;">
+                    Simulate Device Tilt
+                </label>
+                <input type="range" id="tiltSlider" min="-30" max="30" value="0" 
+                       style="width: 300px; cursor: pointer;">
+                <div style="margin-top: 10px; color: #999; font-size: 14px;">
+                    <span id="tiltValue">0°</span> | Speed: <span id="speedValue">0x</span>
                 </div>
             </div>
         </div>
@@ -431,11 +441,16 @@
 
         // Counter simulation
         let counter = 0;
+        let tiltInterval = null;
         const currentNumber = document.getElementById('currentNumber');
         const prevNumber = document.getElementById('prevNumber');
         const nextNumber = document.getElementById('nextNumber');
         const incrementBtn = document.getElementById('incrementBtn');
         const decrementBtn = document.getElementById('decrementBtn');
+        const phoneSimulator = document.getElementById('phoneSimulator');
+        const tiltSlider = document.getElementById('tiltSlider');
+        const tiltValue = document.getElementById('tiltValue');
+        const speedValue = document.getElementById('speedValue');
 
         function updateDisplay() {
             currentNumber.textContent = counter;
@@ -448,6 +463,57 @@
                 currentNumber.style.transform = 'scale(1)';
             }, 100);
         }
+
+        function calculateSpeed(tilt) {
+            const absTilt = Math.abs(tilt);
+            if (absTilt < 5) return 0;
+            if (absTilt < 10) return 0.5;
+            if (absTilt < 15) return 1.0;
+            if (absTilt < 20) return 1.5;
+            if (absTilt < 25) return 2.0;
+            return 3.0;
+        }
+
+        tiltSlider.addEventListener('input', (e) => {
+            const tilt = parseInt(e.target.value);
+            tiltValue.textContent = `${tilt}°`;
+            
+            // Apply 3D rotation to phone
+            phoneSimulator.style.transform = `perspective(1000px) rotateX(${-tilt}deg)`;
+            
+            // Calculate and display speed
+            const speed = calculateSpeed(tilt);
+            speedValue.textContent = speed > 0 ? `${speed}x` : '0x';
+            
+            // Clear existing interval
+            if (tiltInterval) {
+                clearInterval(tiltInterval);
+                tiltInterval = null;
+            }
+            
+            // Start counting based on tilt
+            if (speed > 0) {
+                const interval = 1000 / speed; // Faster speed = shorter interval
+                tiltInterval = setInterval(() => {
+                    if (tilt > 0) {
+                        counter++;
+                    } else {
+                        counter--;
+                    }
+                    updateDisplay();
+                }, interval);
+            }
+        });
+
+        // Reset tilt when mouse is released
+        tiltSlider.addEventListener('change', () => {
+            if (tiltSlider.value == 0) {
+                if (tiltInterval) {
+                    clearInterval(tiltInterval);
+                    tiltInterval = null;
+                }
+            }
+        });
 
         incrementBtn.addEventListener('click', () => {
             counter++;
