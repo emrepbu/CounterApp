@@ -161,6 +161,17 @@ struct ContentView: View {
                     }
                 }
                 
+                Link(destination: URL(string: "https://github.com/emrepbu/CounterApp")!) {
+                    HStack {
+                        Image(systemName: "link.circle.fill")
+                            .font(.title3)
+                        Text("github.com/emrepbu/CounterApp")
+                            .font(.footnote)
+                    }
+                    .foregroundColor(Color.blue)
+                }
+                .padding(.top, 5)
+                
                 Button("Done") {
                     showDebug = false
                 }
