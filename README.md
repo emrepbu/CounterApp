@@ -2,6 +2,8 @@
 
 A simple iOS counter app that counts using phone tilt gestures.
 
+<img src="https://github.com/user-attachments/assets/3dc93fed-19d5-4e89-a520-d9bed63fd7d1" width="300" alt="CounterApp.Logo"/>
+
 ## Features
 
 - Count up/down by tilting your phone
